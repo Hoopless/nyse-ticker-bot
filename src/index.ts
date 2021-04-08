@@ -1,6 +1,17 @@
 import 'dotenv/config'
-import { bot, tickers } from "./utils/constants";
+import { bot, errorLogger, infoLogger, tickers } from "./utils/constants";
 import tickerHandler from "./components/tickerHandler";
+import winston from 'winston';
+
+if (process.env.NODE_ENV !== 'production') {
+    errorLogger.add(new winston.transports.Console({
+    format: winston.format.simple(),
+  }));
+
+  infoLogger.add(new winston.transports.Console({
+    format: winston.format.simple(),
+  }));
+}
 
 const loopBot = () => {
     setTimeout(() => {
@@ -8,7 +19,7 @@ const loopBot = () => {
             tickerHandler(ticker)
         })
         loopBot()
-    }, 2000)
+    }, 5000)
 }
 
 loopBot()

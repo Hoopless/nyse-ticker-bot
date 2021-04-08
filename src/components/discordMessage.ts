@@ -1,6 +1,6 @@
 import { stringify } from "querystring"
 import { NASDAQ } from "../types/nasdaq"
-import { bot, messages } from "../utils/constants"
+import { bot, errorLogger, infoLogger, messages } from "../utils/constants"
 
 const discordMessage = (ticker: string, response: NASDAQ,) => {
 
@@ -18,16 +18,30 @@ const discordMessage = (ticker: string, response: NASDAQ,) => {
   }
 
   if (!messages[ticker]) {
-    bot.createMessage(process.env.DISCORD_CHANNEL_ID as string, discordEmbedContent).then((message) => {
-      messages[ticker] = message.id
-    }) 
-  } else {
-    bot.editMessage(process.env.DISCORD_CHANNEL_ID as string, messages[ticker], discordEmbedContent)
+
+    bot.createMessage(process.env.DISCORD_CHANNEL_ID as string, discordEmbedContent)
+      .then((message) => {
+        messages[ticker] = message.id
+      })
+      .catch(error => errorLogger.error(error))
+
+    return
   }
 
+  bot.editMessage(process.env.DISCORD_CHANNEL_ID as string, messages[ticker], discordEmbedContent)
+    .then((message) => {
+      messages[ticker] = message.id
+    })
+    .catch(error => {
+      messages[ticker] = false
+      errorLogger.error(`Someone deleted the message ${error}`);
+    })
 
 
-  
+
+
+
+
 }
 
 export default discordMessage
