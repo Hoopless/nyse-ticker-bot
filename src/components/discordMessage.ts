@@ -4,15 +4,40 @@ import { bot, errorLogger, infoLogger, messages } from "../utils/constants"
 
 const discordMessage = (ticker: string, response: NASDAQ,) => {
 
+  let currentTicker = response.quoteResponse.result[0];
+  let price;
+  let percentage;
+
+  switch (currentTicker.marketState) {
+    case "PRE":
+      price = currentTicker.preMarketPrice;
+      percentage = currentTicker.preMarketChangePercent;
+      break;
+    case "POST":
+      price = currentTicker.postMarketPrice;
+      percentage = currentTicker.postMarketChangePercent;
+      break;
+    case "CLOSED":
+      return;
+    default:
+
+      break;
+
+  }
+
+  if (! percentage || ! price){
+    return;
+  }
+
   let discordEmbedContent = {
     embed: {
       title: `STOCK ${ticker}`,
       description: `Information regarding the ticker ${ticker}. \n Ticker information is checked every 5 seconds`,
-      color: response.primaryData.deltaIndicator == 'up' ? 3066993 : 15158332,
+      color: percentage > 0 ? 3066993 : 15158332,
       fields: [
-        { name: 'Market Status', value: response.marketStatus, inline: true },
-        { name: 'Current Price', value: response.primaryData.lastSalePrice, inline: true },
-        { name: 'percentage', value: response.primaryData.percentageChange, inline: true },
+        { name: 'Market Status', value: currentTicker.marketState, inline: true },
+        { name: 'Current Price', value: new Intl.NumberFormat('en-US', {style: 'currency', 'currency': 'USD'}).format(price), inline: true },
+        { name: 'percentage', value: new Intl.NumberFormat('nl-NL', {style: 'percent', minimumFractionDigits: 2}).format(percentage / 100), inline: true },
       ]
     }
   }

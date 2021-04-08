@@ -5,9 +5,9 @@ import discordMessage from "./discordMessage"
 
 const tickerHandler = (ticker: string) => {
 
-  axios.get(`https://api.nasdaq.com/api/quote/${ticker}/info?assetclass=stocks`)
+  axios.get(`https://query1.finance.yahoo.com/v7/finance/quote?symbols=${ticker}`)
     .then((response) => {
-      let data: NASDAQ = response.data.data
+      let data: NASDAQ = response.data
 
       discordMessage(ticker, data)
     })
