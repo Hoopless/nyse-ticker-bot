@@ -4,7 +4,7 @@ import { Client as DiscordClient } from 'eris'
 
 export const bot = new DiscordClient(process.env.BOT_TOKEN as string)
 
-export const tickers = ['NET', 'GME', 'TSLA'];
+export const tickers = ['NET', 'GME', 'TSLA', 'AMC'];
 
 export let messages: any = {};
 
