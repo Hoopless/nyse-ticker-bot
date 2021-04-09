@@ -10,17 +10,18 @@ const discordMessage = (ticker: string, response: NASDAQ,) => {
 
   switch (currentTicker.marketState) {
     case "PRE":
-      price = currentTicker.preMarketPrice;
-      percentage = currentTicker.preMarketChangePercent;
+      price = currentTicker.preMarketPrice
+      percentage = currentTicker.preMarketChangePercent
       break;
     case "POST":
-      price = currentTicker.postMarketPrice;
-      percentage = currentTicker.postMarketChangePercent;
+      price = currentTicker.postMarketPrice
+      percentage = currentTicker.postMarketChangePercent
       break;
     case "CLOSED":
       return;
     default:
-
+      price = currentTicker.regularMarketPrice
+      percentage = currentTicker.regularMarketChangePercent
       break;
 
   }
@@ -58,8 +59,11 @@ const discordMessage = (ticker: string, response: NASDAQ,) => {
       messages[ticker] = message.id
     })
     .catch(error => {
-      messages[ticker] = false
-      errorLogger.error(`Someone deleted the message ${error}`);
+      if (error.message === 'Unknown Message') {
+        messages[ticker] = false
+        errorLogger.error(`Someone deleted the message ${error}`);
+      }
+      
     })
 
 

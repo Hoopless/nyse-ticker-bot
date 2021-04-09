@@ -8,10 +8,12 @@ const tickerHandler = (ticker: string) => {
   axios.get(`https://query1.finance.yahoo.com/v7/finance/quote?symbols=${ticker}`)
     .then((response) => {
       let data: NASDAQ = response.data
-
+      
       discordMessage(ticker, data)
     })
-    .catch(error => errorLogger.error(error))
+    .catch(error => {
+      errorLogger.error(error)
+    })
 }
 
 export default tickerHandler
