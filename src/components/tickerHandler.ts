@@ -11,7 +11,7 @@ const tickerHandler = (ticker: string) => {
       
       discordMessage(ticker, data)
     })
-    .catch(error => {
+    .catch(() => {
       return;
     })
 }
