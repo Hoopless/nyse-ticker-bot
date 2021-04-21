@@ -55,13 +55,12 @@ const discordMessage = (ticker: string, response: NASDAQ,) => {
   }
 
   bot.editMessage(process.env.DISCORD_CHANNEL_ID as string, messages[ticker], discordEmbedContent)
-    .then((message) => {
-      messages[ticker] = message.id
-    })
     .catch(error => {
+      errorLogger.error(error)
+      
       if (error.message === 'Unknown Message') {
         messages[ticker] = false
-        errorLogger.error(`Someone deleted the message ${error}`);
+        errorLogger.error(`Someone deleted the message ${error.message}`)
       }
       
     })
