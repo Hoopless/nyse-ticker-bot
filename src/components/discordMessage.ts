@@ -18,7 +18,9 @@ const discordMessage = (ticker: string, response: NASDAQ,) => {
       percentage = currentTicker.postMarketChangePercent
       break;
     case "CLOSED":
-      return;
+      price = currentTicker.postMarketPrice
+      percentage = currentTicker.postMarketChangePercent
+      break;
     default:
       price = currentTicker.regularMarketPrice
       percentage = currentTicker.regularMarketChangePercent
