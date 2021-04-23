@@ -1,6 +1,6 @@
-import { stringify } from "querystring"
 import { NASDAQ } from "../types/nasdaq"
-import { bot, errorLogger, infoLogger, messages } from "../utils/constants"
+import { bot, errorLogger } from "../utils/constants"
+import { readFromFile, writeToFile } from "./MessageDataHander";
 
 const discordMessage = (ticker: string, response: NASDAQ,) => {
 
@@ -28,7 +28,7 @@ const discordMessage = (ticker: string, response: NASDAQ,) => {
 
   }
 
-  if (! percentage || ! price){
+  if (!percentage || !price) {
     return;
   }
 
@@ -39,38 +39,37 @@ const discordMessage = (ticker: string, response: NASDAQ,) => {
       color: percentage > 0 ? 3066993 : 15158332,
       fields: [
         { name: 'Market Status', value: currentTicker.marketState, inline: true },
-        { name: 'Current Price', value: new Intl.NumberFormat('en-US', {style: 'currency', 'currency': 'USD'}).format(price), inline: true },
-        { name: 'percentage', value: new Intl.NumberFormat('nl-NL', {style: 'percent', minimumFractionDigits: 2}).format(percentage / 100), inline: true },
+        { name: 'Current Price', value: new Intl.NumberFormat('en-US', { style: 'currency', 'currency': 'USD' }).format(price), inline: true },
+        { name: 'percentage', value: new Intl.NumberFormat('nl-NL', { style: 'percent', minimumFractionDigits: 2 }).format(percentage / 100), inline: true },
       ]
     }
   }
 
-  if (!messages[ticker]) {
+  const result = readFromFile(ticker);
+
+  if (! result) {
+
 
     bot.createMessage(process.env.DISCORD_CHANNEL_ID as string, discordEmbedContent)
       .then((message) => {
-        messages[ticker] = message.id
+
+        writeToFile(ticker, message.id)
       })
       .catch(error => errorLogger.error(error))
 
     return
   }
 
-  bot.editMessage(process.env.DISCORD_CHANNEL_ID as string, messages[ticker], discordEmbedContent)
+  bot.editMessage(process.env.DISCORD_CHANNEL_ID as string, result, discordEmbedContent)
     .catch(error => {
       errorLogger.error(error)
-      
+
       if (error.message === 'Unknown Message') {
-        messages[ticker] = false
+        writeToFile(ticker, false);
         errorLogger.error(`Someone deleted the message ${error.message}`)
       }
-      
+
     })
-
-
-
-
-
 
 }
 
